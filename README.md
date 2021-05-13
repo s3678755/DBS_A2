@@ -9,6 +9,10 @@ db.data.createIndex( { Sensor_ID: 1 } )
 
 db.data.getIndexes()
 
+java dbqueryA1 3411-01 4096
+
+java -Xmx6g dbqueryA2 3411-01 4096
+
 ----------------------------------
 
 java org.apache.derby.tools.ij
@@ -35,20 +39,30 @@ DROP INDEX Sensor_Index;
 
 ===============================================
 
-db.data.find({"Details": {$elemMatch: {"Hourly_Counts": {$gte: 300}, "MDate": 29, "Month": March, "Year": 2013, "Time": 17}}}, {_id: 0, Sensor_Name: 1}).pretty()
+.explain("executionStats")
 
-db.data.find({"Details": {$elemMatch: {"Sensor_Name": "Alfred Place", "Hourly_Counts": {$gte: 300}).pretty()
+db.data.find({"Details": {$elemMatch: {"Hourly_Counts": {$gte: 300}, "Mdate": 29, "Month": "March", "Year": 2011, "Time": 17}}}, {_id: 0, Sensor_Name: 1}).pretty().explain("executionStats")
 
-db.data.find({"Details": {$elemMatch: {"Sensor_ID": 34, "MDate": 29, "Month": March, "Year": 2013, "Time": 17}}}, {_id: 0, Hourly_Counts: 1}).pretty()
+// db.data.find({"Details.Hourly_Counts": {$gte: 300}, "Details.Mdate": 29, "Details.Month": "March", "Details.Year": 2011, "Details.Time": 17}, {_id: 0, Sensor_Name: 1}).pretty().explain("executionStats")
 
-db.data.find({"Details": {$elemMatch: {"Sensor_ID": 34, "Hourly_Counts": {$gte: 300}, {_id: 0, Date_Time: 1}).pretty()
+db.data.find({"Sensor_Name": "Alfred Place", "Details": {$elemMatch: {"Hourly_Counts": {$gte: 300}}}}, {_id: 0, "Details.Date_Time": 1}).pretty().explain("executionStats")
+
+db.data.find({"Sensor_ID": 34, "Details": {$elemMatch: {"Mdate": 1, "Month": "November", "Year": 2019, "Time": 17}}}, {_id: 0, "Details.Hourly_Counts": 1}).pretty().explain("executionStats")
+
+db.data.find({"Sensor_ID": 34, "Details": {$elemMatch: {"Hourly_Counts": {$gte: 300}}}}, {_id: 0, "Details.Date_Time": 1}).pretty().explain("executionStats")
 
 ===============================================
 
-select sensor.Sensor_Name from sensor where sensor.Sensor_ID in ( SELECT datetime.Sensor_ID FROM datetime WHERE datetime.Hourly_Counts > 300 AND datetime.Mdate = 29 AND datetime.Date_Year = 2013 AND datetime.Month = 'March' AND datetime.Time = 17);
+java org.apache.derby.tools.ij
 
-select * from datetime where datetime.Hourly_Counts >= 300 and datetime.Sensor_ID in (SELECT sensor.Sensor_ID FROM sensor WHERE sensor.Sensor_name = "Alfred Place");
+connect 'jdbc:derby:DBS_A2_Derby;create=true';
 
-select datetime.Hourly_Counts from datetime where datetime.Sensor_ID = 34 and datetime.Mdate = 29 and datetime.Date_Year = 2013 and datetime.Month = 'March' and datetime.Time = 17;
+connect 'jdbc:derby:DBS_A2_Derby';
+
+select sensor.Sensor_Name from sensor where sensor.Sensor_ID in ( SELECT datetime.Sensor_ID FROM datetime WHERE datetime.Hourly_Counts > 300 AND datetime.Mdate = 29 AND datetime.Date_Year = 2011 AND datetime.Month = 'March' AND datetime.Time = 17);
+
+select datetime.Date_Time from datetime where datetime.Hourly_Counts >= 300 and datetime.Sensor_ID in (SELECT sensor.Sensor_ID FROM sensor WHERE sensor.Sensor_Name = 'Alfred Place');
+
+select datetime.Hourly_Counts from datetime where datetime.Sensor_ID = 34 and datetime.Mdate = 1 and datetime.Date_Year = 2019 and datetime.Month = 'November' and datetime.Time = 17;
 
 select datetime.Date_Time from datetime where datetime.Sensor_ID = 34 and datetime.Hourly_Counts >= 300;
