@@ -31,9 +31,11 @@ create table datetime(Date_Time varchar(40), Date_Year int, Month varchar(20), M
 
 CREATE INDEX Sensor_Index on SENSOR (Sensor_ID ASC);
 
-CREATE INDEX Sensor_Index on DATETIME (Sensor_ID ASC);
+CREATE INDEX DateTime_Index on DATETIME (Sensor_ID ASC);
 
 SHOW INDEXES FROM SENSOR;
+
+SHOW INDEXES FROM DATETIME;
 
 DROP INDEX Sensor_Index;
 
@@ -58,6 +60,16 @@ java org.apache.derby.tools.ij
 connect 'jdbc:derby:DBS_A2_Derby;create=true';
 
 connect 'jdbc:derby:DBS_A2_Derby';
+
+connect 'jdbc:derby:DBS_A1_Derby';
+
+MaximumDisplayWidth 5000;
+CALL SYSCS_UTIL.SYSCS_SET_RUNTIMESTATISTICS(1);
+CALL SYSCS_UTIL.SYSCS_SET_STATISTICS_TIMING(1);
+
+VALUES SYSCS_UTIL.SYSCS_GET_RUNTIMESTATISTICS();
+
+CALL SYSCS_UTIL.SYSCS_SET_RUNTIMESTATISTICS(0);
 
 select sensor.Sensor_Name from sensor where sensor.Sensor_ID in ( SELECT datetime.Sensor_ID FROM datetime WHERE datetime.Hourly_Counts > 300 AND datetime.Mdate = 29 AND datetime.Date_Year = 2011 AND datetime.Month = 'March' AND datetime.Time = 17);
 
